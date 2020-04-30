@@ -1,0 +1,41 @@
+{
+  "name": "luoyan/ip-city",
+  "description": "LuoYan Get IP City Program",
+  "type": "think-extend",
+  "keywords": [
+    "LuoYan",
+    "ip_city"
+  ],
+  "homepage": "http://www.52luoyan.com/",
+  "license": "Apache-2.0",
+  "authors": [
+    {
+      "name": "LuoYan",
+      "email": "51085726@qq.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.4.0",
+    "ext-json": "*",
+    "ext-curl": "*",
+    "topthink/framework": "^6.0.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "LuoYan\\IpCity\\": "src"
+    },
+    "files": [
+      "src/function.php"
+    ]
+  },
+  "extra": {
+    "think": {
+      "config": {
+        "ip_city": "src/config.php"
+      }
+    }
+  },
+  "config": {
+    "preferred-install": "dist"
+  }
+}
