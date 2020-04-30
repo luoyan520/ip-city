@@ -71,7 +71,7 @@ class IpCity
 
         $url = 'https://restapi.amap.com/v3/ip';
         $para = '?key=' . $api_key . '&ip=' . $ip;
-        $receive = curl($url . $para);
+        $receive = self::curl($url . $para);
         $json = json_decode($receive, true);
         if ($json['status'] == 1) {
             if ($json['province']) {
@@ -98,7 +98,7 @@ class IpCity
     {
         $url = 'http://freeapi.ipip.net/' . $ip;
 
-        $receive = curl($url);
+        $receive = self::curl($url);
         $json = json_decode($receive, true);
         return [
             'nation' => $json[0],
@@ -121,7 +121,7 @@ class IpCity
         $url = 'https://apis.map.qq.com';
         $para = '/ws/location/v1/ip?ip=' . $ip . '&key=' . $api_key;
         $sig = '&sig=' . md5($para . $sign_str);// 计算签名
-        $receive = curl($url . $para . $sig);
+        $receive = self::curl($url . $para . $sig);
         $json = json_decode($receive, true);
         if ($json['status'] == 0) {
             return [
@@ -132,5 +132,38 @@ class IpCity
         } else {
             return false;
         }
+    }
+	
+	/**
+     * 简易Curl方法
+     *
+     * @param string $url 访问地址
+	 * @param string $post post参数
+	 * @param string $cookie 要发送的cookie
+     * @return string|bool 返回信息
+     */
+	public static function curl(string $url, $post = 0, $cookie = 0): string
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 60);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        $headInit[] = "Accept:*/*";
+        $headInit[] = "Accept-Encoding:gzip,deflate,sdch";
+        $headInit[] = "Accept-Language:zh-CN,zh;q=0.8";
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headInit);
+        if ($post) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+        }
+        if ($cookie) {
+            curl_setopt($ch, CURLOPT_COOKIE, $cookie);
+        }
+        curl_setopt($ch, CURLOPT_ENCODING, "gzip");
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $ret = curl_exec($ch);
+        curl_close($ch);
+        return $ret;
     }
 }
