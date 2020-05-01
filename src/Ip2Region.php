@@ -52,7 +52,7 @@ class Ip2Region
      *
      * @param string $ip2regionFile 数据库文件
      */
-    public function __construct(string $ip2regionFile = './Ip2Region.db')
+    public function __construct(string $ip2regionFile = __DIR__ . '/Ip2Region.db')
     {
         $this->dbFile = $ip2regionFile;
     }
