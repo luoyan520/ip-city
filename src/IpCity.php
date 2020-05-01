@@ -43,7 +43,7 @@ class IpCity
         if ($cache) {
             return $cache;
         } else {
-            $ip2region = new Ip2Region('memory');
+            $ip2region = new Ip2Region();
 			$data = $ip2region->memorySearch($ip);
 			unset($ip2region);
 
