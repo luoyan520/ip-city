@@ -52,10 +52,9 @@ class IpCity
 			$location['nation'] = $data[1] ? $data[1] : '';
 			$location['province'] = $data[2] ? $data[2] : '';
 			$location['city'] = $data[3] ? $data[3] : '';
-			return $location;
+			Cache::set('ipCity_' . $ip, $location, 3600);
 
-            Cache::set('ipCity_' . $ip, $cache, 3600);
-            return $cache;
+			return $location;
         }
     }
 
