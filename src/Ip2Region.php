@@ -49,7 +49,6 @@ class Ip2Region
 
     /**
      * 构造方法
-     *
      * @param string $ip2regionFile 数据库文件
      */
     public function __construct(string $ip2regionFile = __DIR__ . '/Ip2Region.db')
@@ -58,47 +57,25 @@ class Ip2Region
     }
 
     /**
-     * 从字节缓冲区读取long
-     *
-     * @param $b
-     * @param $offset
-     * @return int|string
-     */
-    private static function getLong($b, $offset)
-    {
-        $val = (
-            (ord($b[$offset++])) |
-            (ord($b[$offset++]) << 8) |
-            (ord($b[$offset++]) << 16) |
-            (ord($b[$offset]) << 24)
-        );
-
-        // 如果在32位操作系统上，则将有符号int转换为无符号int
-        if ($val < 0 && PHP_INT_SIZE == 4) {
-            $val = sprintf("%u", $val);
-        }
-
-        return $val;
-    }
-
-    /**
      * 内存搜索算法，会比基于硬盘的搜索快很多
      * 注意：在将其置于公共调用之前调用一次可以使其线程安全
-     *
      * @param string $ip 需要查询额IP
      * @return array|false 成功返回数据，失败返回false
      */
     public function memorySearch(string $ip)
     {
-        $cache = Cache::get('Ip2Region');
-        if ($cache) {
-            $this->dbBinStr = $cache['dbBinStr'];
-            $this->firstIndexPtr = $cache['firstIndexPtr'];
-            $this->lastIndexPtr = $cache['lastIndexPtr'];
-            $this->totalBlocks = $cache['totalBlocks'];
-        } else {
-            // 第一次检查并加载二进制字符串
-            if ($this->dbBinStr == null) {
+        // 第一次执行，检查并加载二进制字符串
+        if ($this->dbBinStr == null) {
+            // 读缓存，看是否有其他进程已保存
+            $cache = Cache::get('Ip2Region');
+            if ($cache) {
+                // 返回缓存内容
+                $this->dbBinStr = $cache['dbBinStr'];
+                $this->firstIndexPtr = $cache['firstIndexPtr'];
+                $this->lastIndexPtr = $cache['lastIndexPtr'];
+                $this->totalBlocks = $cache['totalBlocks'];
+            } else {
+                // 从文件中读取内容并写入缓存
                 $this->dbBinStr = file_get_contents($this->dbFile);
                 if ($this->dbBinStr == false) {
                     throw new HttpException(500, '无法打开IP2Region数据库文件：' . $this->dbFile);
@@ -108,13 +85,13 @@ class Ip2Region
                 $this->lastIndexPtr = self::getLong($this->dbBinStr, 4);
                 $this->totalBlocks = ($this->lastIndexPtr - $this->firstIndexPtr) / 12 + 1;
 
-                $Ip2Region = [
+                $cache = [
                     'dbBinStr' => $this->dbBinStr,
                     'firstIndexPtr' => $this->firstIndexPtr,
                     'lastIndexPtr' => $this->lastIndexPtr,
                     'totalBlocks' => $this->totalBlocks,
                 ];
-                Cache::set('Ip2Region', $Ip2Region, 86400);
+                Cache::set('Ip2Region', $cache, 86400);
             }
         }
 
@@ -155,8 +132,30 @@ class Ip2Region
     }
 
     /**
+     * 从字节缓冲区读取long
+     * @param $b
+     * @param $offset
+     * @return int|string
+     */
+    private static function getLong($b, $offset)
+    {
+        $val = (
+            (ord($b[$offset++])) |
+            (ord($b[$offset++]) << 8) |
+            (ord($b[$offset++]) << 16) |
+            (ord($b[$offset]) << 24)
+        );
+
+        // 如果在32位操作系统上，则将有符号int转换为无符号int
+        if ($val < 0 && PHP_INT_SIZE == 4) {
+            $val = sprintf("%u", $val);
+        }
+
+        return $val;
+    }
+
+    /**
      * 安全的IP处理方法
-     *
      * @param string $ip
      * @return int|string
      */
@@ -175,7 +174,6 @@ class Ip2Region
     /**
      * 用b-tree搜索算法获取与指定ip相关联的数据块
      * 注意：非线程安全
-     *
      * @param $ip
      * @return  array|bool 成功返回数组，失败返回false
      */
