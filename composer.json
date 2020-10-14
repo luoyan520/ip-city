@@ -22,7 +22,7 @@
   },
   "autoload": {
     "psr-4": {
-      "LuoYan\\IpCity\\": "src"
+      "LuoYan\\IpLocation\\": "src"
     }
   },
   "extra": {
