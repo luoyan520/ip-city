@@ -10,7 +10,7 @@
 
 declare (strict_types=1);
 
-namespace LuoYan\IpCity;
+namespace LuoYan\IpLocation;
 
 use think\exception\HttpException;
 use think\facade\Cache;

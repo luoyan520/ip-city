@@ -1,6 +1,6 @@
 <?php
 /**
- * IpCity 通过IP获取客户端所在城市类
+ * IpLocation 通过IP获取客户端所在城市类
  *
  * @Author  LuoYan<51085726@qq.com>
  * @Date  2020-04-29
@@ -8,12 +8,12 @@
 
 declare (strict_types=1);
 
-namespace LuoYan\IpCity;
+namespace LuoYan\IpLocation;
 
 use think\facade\Cache;
 use think\facade\Config;
 
-class IpCity
+class IpLocation
 {
     /**
      * 透过CDN获取客户端真实IP
@@ -32,12 +32,12 @@ class IpCity
      * @param string $ip
      * @return array
      */
-    public static function getIpCity(string $ip): array
+    public static function getipLocation(string $ip): array
     {
         if ($ip == '::1') return array('nation' => '', 'province' => '', 'city' => '保留地址');
         if ($ip == '127.0.0.1') return array('nation' => '', 'province' => '', 'city' => '本机地址');
 
-        $cache = Cache::get('ipCity_' . $ip);
+        $cache = Cache::get('ipLocation_' . $ip);
         if ($cache) return $cache;
 
         $ip2region = new Ip2Region();
@@ -51,7 +51,7 @@ class IpCity
         $location['nation'] = $data[1] ? $data[1] : '';
         $location['province'] = $data[2] ? $data[2] : '';
         $location['city'] = $data[3] ? $data[3] : '';
-        Cache::set('ipCity_' . $ip, $location, 3600);
+        Cache::set('ipLocation_' . $ip, $location, 3600);
 
         return $location;
     }
@@ -61,9 +61,9 @@ class IpCity
      * @param string $ip
      * @return array 省份和城市信息
      */
-    public static function getIpCityByAMap(string $ip): array
+    public static function getipLocationByAMap(string $ip): array
     {
-        $api_key = Config::get('ip_city.amap_api_key');
+        $api_key = Config::get('ip_location.amap_api_key');
 
         $url = 'https://restapi.amap.com/v3/ip';
         $para = '?key=' . $api_key . '&ip=' . $ip;
@@ -118,7 +118,7 @@ class IpCity
      * @param string $ip
      * @return array
      */
-    public static function getIpCityByIpip(string $ip): array
+    public static function getipLocationByIpip(string $ip): array
     {
         $url = 'http://freeapi.ipip.net/' . $ip;
 
@@ -137,10 +137,10 @@ class IpCity
      * @param string $ip
      * @return array 省份和城市信息
      */
-    public static function getIpCityByTencent(string $ip): array
+    public static function getipLocationByTencent(string $ip): array
     {
-        $api_key = Config::get('ip_city.tencent_api_key');// 腾讯IP接口秘钥
-        $sign_str = Config::get('ip_city.tencent_sign_str');// 腾讯IP接口签名字符串
+        $api_key = Config::get('ip_location.tencent_api_key');// 腾讯IP接口秘钥
+        $sign_str = Config::get('ip_location.tencent_sign_str');// 腾讯IP接口签名字符串
 
         $url = 'https://apis.map.qq.com';
         $para = '/ws/location/v1/ip?ip=' . $ip . '&key=' . $api_key;

@@ -1,10 +1,10 @@
 {
-  "name": "luoyan/ip-city",
-  "description": "LuoYan Get IP City Program",
+  "name": "luoyan/ip-Location",
+  "description": "LuoYan Get IP Location Program",
   "type": "think-extend",
   "keywords": [
     "LuoYan",
-    "ip_city"
+    "ip_location"
   ],
   "homepage": "http://www.52luoyan.com/",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
   "extra": {
     "think": {
       "config": {
-        "ip_city": "src/config.php"
+        "ip_location": "src/config.php"
       }
     }
   },
