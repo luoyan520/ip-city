@@ -34,9 +34,6 @@ class IpLocation
      */
     public static function getipLocation(string $ip): array
     {
-        if ($ip == '::1') return array('nation' => '', 'province' => '', 'city' => '保留地址');
-        if ($ip == '127.0.0.1') return array('nation' => '', 'province' => '', 'city' => '本机地址');
-
         $cache = Cache::get('ipLocation_' . $ip);
         if ($cache) return $cache;
 
@@ -48,9 +45,10 @@ class IpLocation
 
         $data = explode('|', $data['region']);
         $location = array();
-        $location['nation'] = $data[1] ? $data[1] : '';
+        $location['nation'] = $data[0] ? $data[0] : '';
         $location['province'] = $data[2] ? $data[2] : '';
         $location['city'] = $data[3] ? $data[3] : '';
+        $location['isp'] = $data[4] ? $data[4] : '';
         Cache::set('ipLocation_' . $ip, $location, 3600);
 
         return $location;
